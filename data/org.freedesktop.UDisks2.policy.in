@@ -16,8 +16,8 @@
     <description>Mount a filesystem</description>
     <message>Authentication is required to mount the filesystem</message>
     <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
+      <allow_any>yes</allow_any>
+      <allow_inactive>yes</allow_inactive>
       <allow_active>yes</allow_active>
     </defaults>
   </action>
@@ -29,7 +29,7 @@
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_active>auth_self_keep</allow_active>
     </defaults>
   </action>
 
@@ -38,9 +38,9 @@
     <description>Mount a filesystem from a device plugged into another seat</description>
     <message>Authentication is required to mount the filesystem</message>
     <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_any>yes</allow_any>
+      <allow_inactive>yes</allow_inactive>
+      <allow_active>yes</allow_active>
     </defaults>
   </action>
 
@@ -63,9 +63,9 @@
     <description>Unmount a device mounted by another user</description>
     <message>Authentication is required to unmount a filesystem mounted by another user</message>
     <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_any>yes</allow_any>
+      <allow_inactive>yes</allow_inactive>
+      <allow_active>yes</allow_active>
     </defaults>
   </action>
 
@@ -102,7 +102,7 @@
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_active>auth_self_keep</allow_active>
     </defaults>
   </action>
 
@@ -111,9 +111,9 @@
     <description>Unlock an encrypted device plugged into another seat</description>
     <message>Authentication is required to unlock an encrypted device</message>
     <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_any>auth_self</allow_any>
+      <allow_inactive>auth_self</allow_inactive>
+      <allow_active>auth_self_keep</allow_active>
     </defaults>
   </action>
 
@@ -319,7 +319,7 @@
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_active>auth_self_keep</allow_active>
     </defaults>
   </action>
 
@@ -328,9 +328,9 @@
     <description>Modify a device</description>
     <message>Authentication is required to modify a device plugged into another seat</message>
     <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin_keep</allow_active>
+      <allow_any>auth_self</allow_any>
+      <allow_inactive>auth_self</allow_inactive>
+      <allow_active>auth_self_keep</allow_active>
     </defaults>
   </action>
 
@@ -384,7 +384,7 @@
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_admin</allow_active>
+      <allow_active>auth_self</allow_active>
     </defaults>
   </action>
 
