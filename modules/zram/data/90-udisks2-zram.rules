@@ -4,4 +4,4 @@
 #
 
 # ZRAM devices management through the udisks2-zram module
-KERNEL=="zram[0-9]", ENV{SYSTEMD_WANTS}="udisks2-zram-setup@zram%n.service", TAG+="systemd"
+# KERNEL=="zram[0-9]", ENV{SYSTEMD_WANTS}="udisks2-zram-setup@zram%n.service", TAG+="systemd"
