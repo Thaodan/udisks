@@ -602,7 +602,7 @@ calculate_mount_point (UDisksDaemon  *daemon,
             }
           /* Then create the per-user MOUNT_BASE/$USER */
 #ifdef HAVE_ACL
-          if (g_mkdir (mount_dir, 0700) != 0 && errno != EEXIST)
+          if (g_mkdir (mount_dir, 0755) != 0 && errno != EEXIST)
 #else
           if (g_mkdir (mount_dir, 0750) != 0 && errno != EEXIST)
 #endif
