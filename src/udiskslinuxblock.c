@@ -2316,8 +2316,13 @@ wait_for_luks_uuid (UDisksDaemon *daemon,
   if (block == NULL)
     goto out;
 
+  // Currently /dev/mmcblk devices won't get assigned with ID_FS_TYPE=crypto_LUKS when formatting encryption
+  // enabled whereas with /dev/sda devices crypto_LUKS will appear. Wait condition used only when formatting encryption
+  // enabled.
+#if 0
   if (g_strcmp0 (udisks_block_get_id_type (block), "crypto_LUKS") != 0)
     goto out;
+#endif
 
   ret = g_object_ref (data->object);
 
