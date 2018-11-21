@@ -73,7 +73,7 @@ const FSInfo _fs_info[] =
       NULL,
       TRUE,  /* supports_online_label_rename */
       TRUE,  /* supports_owners */
-      "mkfs.ext2 -F -L $LABEL $OPTIONS $DEVICE",
+      "mkfs.ext2 -m 0 -F -L $LABEL $OPTIONS $DEVICE",
       "mkfs.ext2 -n -F -L $LABEL $OPTIONS $DEVICE",
       "-E nodiscard", /* option_no_discard */
     },
@@ -83,7 +83,7 @@ const FSInfo _fs_info[] =
       NULL,
       TRUE,  /* supports_online_label_rename */
       TRUE,  /* supports_owners */
-      "mkfs.ext3 -F -L $LABEL $OPTIONS $DEVICE",
+      "mkfs.ext3 -m 0 -F -L $LABEL $OPTIONS $DEVICE",
       "mkfs.ext3 -n -F -L $LABEL $OPTIONS $DEVICE",
       "-E nodiscard", /* option_no_discard */
     },
@@ -93,7 +93,7 @@ const FSInfo _fs_info[] =
       NULL,
       TRUE,  /* supports_online_label_rename */
       TRUE,  /* supports_owners */
-      "mkfs.ext4 -F -L $LABEL $OPTIONS $DEVICE",
+      "mkfs.ext4 -m 0 -F -L $LABEL $OPTIONS $DEVICE",
       "mkfs.ext4 -n -F -L $LABEL $OPTIONS $DEVICE",
       "-E nodiscard", /* option_no_discard */
     },
