@@ -27,6 +27,7 @@ CPPFLAGS =                                                                     \
 	$(GIO_CFLAGS)                                                          \
 	$(GMODULE_CFLAGS)                                                      \
 	$(BLOCKDEV_CFLAGS)                                                     \
+	$(DCONF_CFLAGS)                                                        \
 	$(WARN_CFLAGS)                                                         \
 	$(NULL)
 
@@ -151,6 +152,7 @@ libudisks_daemon_la_LIBADD =                                                   \
 	$(LIBELOGIND_LIBS)                                                     \
 	$(PART_LDFLAGS)                                                        \
 	$(SWAP_LIBS)                                                           \
+	$(DCONF_LIBS)                                                          \
 	$(top_builddir)/udisks/libudisks2.la                                   \
 	$(NULL)
 
@@ -172,6 +174,7 @@ udisksd_LDADD =                                                                \
 	$(GIO_LIBS)                                                            \
 	$(GMODULE_LIBS)                                                        \
 	$(BLOCKDEV_LIBS)                                                       \
+	$(DCONF_LIBS)                                                          \
 	libudisks-daemon.la                                                    \
 	$(NULL)
 
