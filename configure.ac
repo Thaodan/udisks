@@ -183,6 +183,11 @@ if test "x$enable_daemon" = "xyes"; then
       ])
       ])])
 
+
+  PKG_CHECK_MODULES(DCONF, [dconf >= 0.28.0])
+  AC_SUBST(DCONF_CFLAGS)
+  AC_SUBST(DCONF_LIBS)
+
   PKG_CHECK_MODULES(LIBMOUNT, [mount >= 2.18])
   AC_SUBST(LIBMOUNT_CFLAGS)
   AC_SUBST(LIBMOUNT_LIBS)

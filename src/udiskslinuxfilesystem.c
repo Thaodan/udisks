@@ -41,6 +41,8 @@
 
 #include <glib/gstdio.h>
 
+#include <dconf.h>
+
 #include "udiskslogging.h"
 #include "udiskslinuxfilesystem.h"
 #include "udiskslinuxfilesystemhelpers.h"
@@ -369,15 +371,61 @@ is_well_known_filesystem (const gchar *fstype)
   return ret;
 }
 
+static gboolean read_whitelist = FALSE;
+static gsize num_whitelite_fs = 0;
+static gchar **whitelisted_filesystems = NULL;
+
+static void
+build_filesystem_whitelist (void)
+{
+  if (!read_whitelist)
+    {
+      DConfClient *client = dconf_client_new();
+      GVariant *value = dconf_client_read(client, "/org/freedesktop/udisks2/filesystem/whitelist");
+      if (value)
+        {
+          const GVariantType *type = g_variant_get_type(value);
+          if (g_variant_type_equal(type, G_VARIANT_TYPE_STRING_ARRAY))
+            {
+              whitelisted_filesystems = g_variant_dup_strv(value, &num_whitelite_fs);
+            }
+          g_variant_unref(value);
+        }
+
+      if (client)
+        {
+          g_object_unref(client);
+        }
+      read_whitelist = TRUE;
+    }
+};
+
 /* this is not a very efficient implementation but it's very rarely
  * called so no real point in optimizing it...
  */
 static gboolean
 is_allowed_filesystem (const gchar *fstype)
 {
-  return is_well_known_filesystem (fstype) ||
+  gboolean allowed = FALSE;
+  gsize i = 0;
+
+  // Builds fs whitelist only once.
+  build_filesystem_whitelist();
+
+  allowed = (num_whitelite_fs == 0);
+
+  for (i = 0; i < num_whitelite_fs; ++i)
+    {
+      if (g_strcmp0 (whitelisted_filesystems[i], fstype) == 0)
+        {
+          allowed = TRUE;
+          break;
+        }
+    }
+
+  return allowed && (is_well_known_filesystem (fstype) ||
     is_in_filesystem_file ("/proc/filesystems", fstype) ||
-    is_in_filesystem_file ("/etc/filesystems", fstype);
+    is_in_filesystem_file ("/etc/filesystems", fstype));
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -455,6 +503,19 @@ calculate_fs_type (UDisksBlock  *block,
 
  out:
   g_assert (fs_type_to_use == NULL || g_utf8_validate (fs_type_to_use, -1, NULL));
+
+  // If we have whitelist in use test that fs_type_to_use is part of allowed types.
+  if ((*error == NULL) && !is_allowed_filesystem (fs_type_to_use))
+    {
+      g_set_error (error,
+                   UDISKS_ERROR,
+                   UDISKS_ERROR_OPTION_NOT_PERMITTED,
+                   "Requested filesystem type `%s' is neither well-known nor "
+                   "in /proc/filesystems nor in /etc/filesystems",
+                   fs_type_to_use);
+      g_free(fs_type_to_use);
+      fs_type_to_use = NULL;
+    }
 
   return fs_type_to_use;
 }
