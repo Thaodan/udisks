@@ -18,14 +18,17 @@ dbusconf_DATA = $(dbusconf_in_files:.conf.in=.conf)
 $(dbusconf_DATA): $(dbusconf_in_files) Makefile
 	cp $< $@
 
-systemdservice_in_files = udisks2.service.in
+systemdservice_in_files = udisks2.service.in mount-sd@.service.in
 
 if HAVE_SYSTEMD
 systemdservicedir       = $(systemdsystemunitdir)
 systemdservice_DATA     = $(systemdservice_in_files:.service.in=.service)
 
 $(systemdservice_DATA): $(systemdservice_in_files) Makefile
-	@sed -e "s|\@udisksdprivdir\@|$(libexecdir)/udisks2|" $< > $@
+	@sed -e "s|\@udisksdprivdir\@|$(libexecdir)/udisks2|" \
+             -e "s|\@bindir\@|$(bindir)|" \
+	     -e "s|\@localstatedir\@|$(localstatedir)|" \
+	$@.in > $@
 endif
 
 udevrulesdir = $(udevdir)/rules.d

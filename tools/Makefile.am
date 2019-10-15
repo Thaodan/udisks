@@ -36,6 +36,9 @@ udisksctl_LDADD =                                                              \
 	$(top_builddir)/udisks/libudisks2.la                                   \
 	$(NULL)
 
+extradir = $(bindir)
+extra_DATA = udisksctl-user
+
 # ------------------------------------------------------------------------------
 
 if ENABLE_DAEMON
