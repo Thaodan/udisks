@@ -1,0 +1,13 @@
+[Unit]
+Description=Handle udisks sd mount
+After=udisks2.service dev-%i.device start-user-session.service
+Requisite=dev-%i.device
+Requires=udisks2.service
+Conflicts=rescue.target actdead.target factory-test.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=-@localstatedir@/environment/udisks2/*.conf
+ExecStart=@bindir@/udisksctl-user mount $UDISKS2_MOUNT_OPTIONS -b /dev/%i
+ExecStop=@bindir@/udisksctl unmount -b /dev/%i

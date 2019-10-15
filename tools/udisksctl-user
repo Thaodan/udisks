@@ -1,0 +1,4 @@
+#!/bin/sh
+ARGS=$@
+DEVICEUSER=$(loginctl list-sessions | grep seat0 | tr -s " " | cut -d " " -f 4)
+/bin/su -l $DEVICEUSER -c "/usr/bin/udisksctl $ARGS"
