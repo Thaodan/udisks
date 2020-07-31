@@ -2968,6 +2968,7 @@ udisks_linux_block_handle_format (UDisksBlock             *block,
   uid_t caller_uid;
   gid_t caller_gid;
   gboolean take_ownership = FALSE;
+  gboolean set_group_permissions = FALSE;
   GString *encrypt_passphrase = NULL;
   gchar *encrypt_type = NULL;
   gchar *erase_type = NULL;
@@ -3005,6 +3006,7 @@ udisks_linux_block_handle_format (UDisksBlock             *block,
   udisks_state_check_block (state, udisks_linux_block_object_get_device_number (UDISKS_LINUX_BLOCK_OBJECT (object)));
 
   g_variant_lookup (options, "take-ownership", "b", &take_ownership);
+  g_variant_lookup (options, "set-group-permissions", "b", &set_group_permissions);
   udisks_variant_lookup_binary (options, "encrypt.passphrase", &encrypt_passphrase);
   g_variant_lookup (options, "encrypt.type", "s", &encrypt_type);
   g_variant_lookup (options, "erase", "s", &erase_type);
@@ -3469,7 +3471,8 @@ udisks_linux_block_handle_format (UDisksBlock             *block,
   if (take_ownership && fs_info->supports_owners)
     {
       if (!take_filesystem_ownership (udisks_block_get_device (block_to_mkfs),
-                                      type, caller_uid, caller_gid, FALSE, &error))
+                                      type, caller_uid, caller_gid, FALSE,
+                                      set_group_permissions, &error))
         {
           g_prefix_error (&error,
                           "Failed to take ownership of newly created filesystem: ");

@@ -119,6 +119,7 @@ take_filesystem_ownership (const gchar  *device,
                            uid_t         caller_uid,
                            gid_t         caller_gid,
                            gboolean      recursive,
+                           gboolean      set_group_permissions,
                            GError      **error)
 
 {
@@ -126,6 +127,7 @@ take_filesystem_ownership (const gchar  *device,
   GError *local_error = NULL;
   gboolean unmount = FALSE;
   gboolean success = TRUE;
+  mode_t chmod_mode = 0700;
 
   mountpoint = bd_fs_get_mountpoint (device, &local_error);
   if (mountpoint == NULL)
@@ -173,11 +175,16 @@ take_filesystem_ownership (const gchar  *device,
   if (! success)
     goto out;
 
-  if (chmod (mountpoint, 0700) != 0)
+  if (set_group_permissions)
+    {
+      chmod_mode |= 070;
+    }
+
+  if (chmod (mountpoint, chmod_mode) != 0)
     {
       g_set_error (error, UDISKS_ERROR, UDISKS_ERROR_FAILED,
-                   "Cannot chmod %s to mode 0700: %m",
-                   mountpoint);
+                   "Cannot chmod %s to mode %o: %m",
+                   mountpoint, chmod_mode);
       success = FALSE;
       goto out;
     }
