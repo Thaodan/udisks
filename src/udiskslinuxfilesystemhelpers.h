@@ -36,6 +36,7 @@ gboolean take_filesystem_ownership (const gchar *device,
                                     uid_t caller_uid,
                                     gid_t caller_gid,
                                     gboolean recursive,
+                                    gboolean set_group_permissions,
                                     GError **error);
 
 G_END_DECLS

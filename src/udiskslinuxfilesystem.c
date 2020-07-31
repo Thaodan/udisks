@@ -2307,10 +2307,12 @@ handle_take_ownership (UDisksFilesystem      *filesystem,
   UDisksBaseJob *job = NULL;
   GError *error = NULL;
   gboolean recursive = FALSE;
+  gboolean set_group_permissions = FALSE;
   uid_t caller_uid;
   gid_t caller_gid;
 
   g_variant_lookup (options, "recursive", "b", &recursive);
+  g_variant_lookup (options, "set-group-permissions", "b", &set_group_permissions);
 
   /* only allow a single call at a time */
   g_mutex_lock (&UDISKS_LINUX_FILESYSTEM (filesystem)->lock);
@@ -2403,6 +2405,7 @@ handle_take_ownership (UDisksFilesystem      *filesystem,
                                    probed_fs_type,
                                    caller_uid, caller_gid,
                                    recursive,
+                                   set_group_permissions,
                                    &error))
     {
       g_dbus_method_invocation_return_error (invocation,
