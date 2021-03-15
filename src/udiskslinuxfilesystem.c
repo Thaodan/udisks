@@ -705,6 +705,9 @@ calculate_mount_point (UDisksDaemon  *daemon,
    *
    *       See http://en.wikipedia.org/wiki/UTF-8 for details.
    */
+#if 1
+  (void)label;
+#else
   if (label != NULL && strlen (label) > 0)
     {
       str = g_string_new (NULL);
@@ -721,7 +724,9 @@ calculate_mount_point (UDisksDaemon  *daemon,
       mount_point = g_string_free (str, FALSE);
       g_free (s);
     }
-  else if (uuid != NULL && strlen (uuid) > 0)
+  else
+#endif
+  if (uuid != NULL && strlen (uuid) > 0)
     {
       str = g_string_new (NULL);
       g_string_append_printf (str, "%s/", mount_dir);
