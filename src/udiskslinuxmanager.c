@@ -35,7 +35,9 @@
 
 #include <blockdev/loop.h>
 #include <blockdev/fs.h>
+#ifdef HAVE_BLOCKDEV_MDRAID
 #include <blockdev/mdraid.h>
+#endif
 
 #include "udiskslogging.h"
 #include "udiskslinuxmanager.h"
@@ -507,7 +509,9 @@ wait_for_array_object (UDisksDaemon *daemon,
   return ret;
 }
 
+#ifdef HAVE_BLOCKDEV_MDRAID
 static const gchar *raid_level_whitelist[] = {"raid0", "raid1", "raid4", "raid5", "raid6", "raid10", NULL};
+#endif
 
 static gboolean
 handle_mdraid_create (UDisksManager         *_object,
@@ -518,6 +522,7 @@ handle_mdraid_create (UDisksManager         *_object,
                       guint64                arg_chunk,
                       GVariant              *arg_options)
 {
+#ifdef HAVE_BLOCKDEV_MDRAID
   UDisksLinuxManager *manager = UDISKS_LINUX_MANAGER (_object);
   UDisksObject *array_object = NULL;
   uid_t caller_uid;
@@ -872,6 +877,9 @@ handle_mdraid_create (UDisksManager         *_object,
   g_clear_object (&array_object);
 
   return TRUE; /* returning TRUE means that we handled the method invocation */
+#else
+  return FALSE;
+#endif
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1042,6 +1050,7 @@ handle_can_resize (UDisksManager         *object,
                    GDBusMethodInvocation *invocation,
                    const gchar           *type)
 {
+#ifdef HAVE_BLOCKDEV_PART
   GError *error = NULL;
   gchar *required_utility = NULL;
   BDFsResizeFlags mode;
@@ -1063,6 +1072,9 @@ handle_can_resize (UDisksManager         *object,
   g_free (required_utility);
 
   return TRUE;
+#else
+  return FALSE;
+#endif
 }
 
 static gboolean
@@ -1070,6 +1082,7 @@ handle_can_check (UDisksManager         *object,
                   GDBusMethodInvocation *invocation,
                   const gchar           *type)
 {
+#ifdef HAVE_BLOCKDEV_MDRAID
   GError *error = NULL;
   gchar *required_utility = NULL;
   gboolean ret;
@@ -1088,8 +1101,10 @@ handle_can_check (UDisksManager         *object,
                                                     ret ? "" : required_utility));
 
   g_free (required_utility);
-
   return TRUE;
+#else
+  return FALSE;
+#endif
 }
 
 static gboolean
@@ -1097,6 +1112,7 @@ handle_can_repair (UDisksManager         *object,
                    GDBusMethodInvocation *invocation,
                    const gchar           *type)
 {
+#ifdef HAVE_BLOCKDEV_MDRAID
   GError *error = NULL;
   gchar *required_utility = NULL;
   gboolean ret;
@@ -1117,6 +1133,9 @@ handle_can_repair (UDisksManager         *object,
   g_free (required_utility);
 
   return TRUE;
+#else
+  return FALSE;
+#endif
 }
 
 

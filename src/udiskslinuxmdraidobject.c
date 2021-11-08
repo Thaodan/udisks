@@ -431,7 +431,11 @@ mdraid_update (UDisksLinuxMDRaidObject  *object,
                const gchar              *uevent_action,
                GDBusInterface           *_iface)
 {
+#ifdef HAVE_BLOCKDEV_MDRAID
   return udisks_linux_mdraid_update (UDISKS_LINUX_MDRAID (object->iface_mdraid), object);
+#else
+  return FALSE;
+#endif
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -619,6 +623,7 @@ udisks_linux_mdraid_object_uevent (UDisksLinuxMDRaidObject *object,
                                    UDisksLinuxDevice       *device,
                                    gboolean                 is_member)
 {
+#ifdef HAVE_BLOCKDEV_MDRAID
   g_return_if_fail (UDISKS_IS_LINUX_MDRAID_OBJECT (object));
   g_return_if_fail (UDISKS_IS_LINUX_DEVICE (device));
 
@@ -732,6 +737,7 @@ udisks_linux_mdraid_object_uevent (UDisksLinuxMDRaidObject *object,
     }
  out:
   ;
+#endif
 }
 
 /* ---------------------------------------------------------------------------------------------------- */

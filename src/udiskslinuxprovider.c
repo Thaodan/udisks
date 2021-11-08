@@ -30,7 +30,6 @@
 #include "udiskslinuxprovider.h"
 #include "udiskslinuxblockobject.h"
 #include "udiskslinuxdriveobject.h"
-#include "udiskslinuxmdraidobject.h"
 #include "udiskslinuxmanager.h"
 #include "udisksstate.h"
 #include "udiskslinuxdevice.h"
@@ -39,6 +38,10 @@
 #include "udisksmoduleobject.h"
 #include "udisksdaemonutil.h"
 #include "udisksconfigmanager.h"
+
+#ifdef HAVE_BLOCKDEV_MDRAID
+#include "udiskslinuxmdraidobject.h"
+#endif
 
 /**
  * SECTION:udiskslinuxprovider
@@ -75,9 +78,11 @@ struct _UDisksLinuxProvider
   GHashTable *sysfs_path_to_drive;
 
   /* maps from array UUID and sysfs_path to UDisksLinuxMDRaidObject instances */
+#ifdef HAVE_BLOCKDEV_MDRAID
   GHashTable *uuid_to_mdraid;
   GHashTable *sysfs_path_to_mdraid;
   GHashTable *sysfs_path_to_mdraid_members;
+#endif
 
   /* maps from UDisksModule to nested hashtables containing object skeleton instances */
   GHashTable *module_objects;
@@ -185,9 +190,11 @@ udisks_linux_provider_finalize (GObject *object)
   g_hash_table_unref (provider->sysfs_to_block);
   g_hash_table_unref (provider->vpd_to_drive);
   g_hash_table_unref (provider->sysfs_path_to_drive);
+#ifdef HAVE_BLOCKDEV_MDRAID
   g_hash_table_unref (provider->uuid_to_mdraid);
   g_hash_table_unref (provider->sysfs_path_to_mdraid);
   g_hash_table_unref (provider->sysfs_path_to_mdraid_members);
+#endif
   g_hash_table_unref (provider->module_objects);
   g_object_unref (provider->gudev_client);
 
@@ -677,6 +684,7 @@ udisks_linux_provider_start (UDisksProvider *_provider)
                                                          g_str_equal,
                                                          g_free,
                                                          NULL);
+#ifdef HAVE_BLOCKDEV_MDRAID
   provider->uuid_to_mdraid = g_hash_table_new_full (g_str_hash,
                                                     g_str_equal,
                                                     g_free,
@@ -689,6 +697,7 @@ udisks_linux_provider_start (UDisksProvider *_provider)
                                                                   g_str_equal,
                                                                   g_free,
                                                                   NULL);
+#endif
   provider->module_objects = g_hash_table_new_full (g_direct_hash,
                                                     g_direct_equal,
                                                     NULL,
@@ -876,6 +885,8 @@ perform_initial_housekeeping_for_drive (GTask           *task,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#ifdef HAVE_BLOCKDEV_MDRAID
+
 /* called with lock held */
 
 static void
@@ -1018,6 +1029,8 @@ handle_block_uevent_for_mdraid (UDisksLinuxProvider *provider,
   if (uuid == NULL && member_uuid == NULL)
     handle_block_uevent_for_mdraid_with_uuid (provider, action, device, NULL, FALSE);
 }
+
+#endif
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -1338,7 +1351,9 @@ handle_block_uevent (UDisksLinuxProvider *provider,
     {
       handle_block_uevent_for_block (provider, action, device);
       handle_block_uevent_for_drive (provider, action, device);
+#ifdef HAVE_BLOCKDEV_MDRAID
       handle_block_uevent_for_mdraid (provider, action, device);
+#endif
       handle_block_uevent_for_modules (provider, action, device);
     }
   else
@@ -1357,7 +1372,9 @@ handle_block_uevent (UDisksLinuxProvider *provider,
       else
         {
           handle_block_uevent_for_modules (provider, action, device);
+#ifdef HAVE_BLOCKDEV_MDRAID
           handle_block_uevent_for_mdraid (provider, action, device);
+#endif
           handle_block_uevent_for_drive (provider, action, device);
           handle_block_uevent_for_block (provider, action, device);
         }

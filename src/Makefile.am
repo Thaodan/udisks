@@ -79,9 +79,6 @@ libudisks_daemon_la_SOURCES =                                                  \
 	udiskslinuxdriveobject.h       udiskslinuxdriveobject.c                \
 	udiskslinuxdrive.h             udiskslinuxdrive.c                      \
 	udiskslinuxdriveata.h          udiskslinuxdriveata.c                   \
-	udiskslinuxmdraidobject.h      udiskslinuxmdraidobject.c               \
-	udiskslinuxmdraidhelpers.h     udiskslinuxmdraidhelpers.c              \
-	udiskslinuxmdraid.h            udiskslinuxmdraid.c                     \
 	udiskslinuxmanager.h           udiskslinuxmanager.c                    \
 	udiskslinuxmountoptions.h      udiskslinuxmountoptions.c               \
 	udiskslinuxfsinfo.h            udiskslinuxfsinfo.c                     \
@@ -112,6 +109,13 @@ libudisks_daemon_la_SOURCES +=                                                 \
 	udisksutabentry.h              udisksutabentry.c                       \
 	udisksutabmonitor.h            udisksutabmonitor.c
 endif # HAVE_LIBMOUNT_UTAB
+
+if HAVE_BLOCKDEV_MDRAID
+libudisks_daemon_la_SOURCES +=
+	udiskslinuxmdraidobject.h      udiskslinuxmdraidobject.c               \
+	udiskslinuxmdraidhelpers.h     udiskslinuxmdraidhelpers.c              \
+	udiskslinuxmdraid.h            udiskslinuxmdraid.c
+endif # HAVE_BLOCKDEV_MDRAID
 
 libudisks_daemon_la_CFLAGS =                                                   \
 	-I$(top_srcdir)                                                        \

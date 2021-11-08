@@ -33,7 +33,9 @@
 
 #include <glib/gstdio.h>
 
+#ifdef HAVE_BLOCKDEV_PART
 #include <blockdev/part.h>
+#endif
 
 #include "udiskslogging.h"
 #include "udiskslinuxpartition.h"
@@ -327,6 +329,7 @@ handle_set_flags (UDisksPartition       *partition,
                   guint64                flags,
                   GVariant              *options)
 {
+#ifdef HAVE_BLOCKDEV_PART
   UDisksBlock *block = NULL;
   UDisksObject *object = NULL;
   UDisksDaemon *daemon = NULL;
@@ -464,6 +467,7 @@ handle_set_flags (UDisksPartition       *partition,
   g_clear_object (&partition_table);
   g_clear_object (&partition_table_block);
   g_clear_object (&object);
+#endif
 
   return TRUE; /* returning TRUE means that we handled the method invocation */
 }
@@ -477,6 +481,7 @@ handle_set_name (UDisksPartition       *partition,
                  const gchar           *name,
                  GVariant              *options)
 {
+#ifdef HAVE_BLOCKDEV_PART
   UDisksBlock *block = NULL;
   UDisksObject *object = NULL;
   UDisksDaemon *daemon = NULL;
@@ -592,6 +597,7 @@ handle_set_name (UDisksPartition       *partition,
   g_clear_object (&partition_table_block);
   g_clear_object (&object);
 
+#endif
   return TRUE; /* returning TRUE means that we handled the method invocation */
 }
 
@@ -648,6 +654,7 @@ udisks_linux_partition_set_type_sync (UDisksLinuxPartition  *partition,
                                       GCancellable          *cancellable,
                                       GError               **error)
 {
+#ifdef HAVE_BLOCKDEV_PART
   gboolean ret = FALSE;
   UDisksBlock *block = NULL;
   UDisksObject *object = NULL;
@@ -784,6 +791,9 @@ udisks_linux_partition_set_type_sync (UDisksLinuxPartition  *partition,
   g_clear_error (&loc_error);
 
   return ret;
+#else
+  return TRUE;
+#endif
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -821,6 +831,7 @@ typedef struct
   guint64      new_size;
 } WaitForPartitionResizeData;
 
+#ifdef HAVE_BLOCKDEV_PART
 static UDisksObject *
 wait_for_partition_resize (UDisksDaemon *daemon,
                            gpointer      user_data)
@@ -843,6 +854,7 @@ wait_for_partition_resize (UDisksDaemon *daemon,
 
   return object;
 }
+#endif
 
 /* runs in thread dedicated to handling @invocation */
 static gboolean
@@ -851,6 +863,7 @@ handle_resize (UDisksPartition       *partition,
                guint64                size,
                GVariant              *options)
 {
+#ifdef HAVE_BLOCKDEV_PART
   UDisksBlock *block = NULL;
   UDisksObject *object = NULL;
   UDisksDaemon *daemon = NULL;
@@ -961,6 +974,9 @@ handle_resize (UDisksPartition       *partition,
 
   return TRUE; /* returning TRUE means that we handled the method invocation */
 
+#else
+  return FALSE;
+#endif
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -971,6 +987,7 @@ handle_delete (UDisksPartition       *partition,
                GDBusMethodInvocation *invocation,
                GVariant              *options)
 {
+#ifdef HAVE_BLOCKDEV_PART
   UDisksBlock *block = NULL;
   UDisksObject *object = NULL;
   UDisksDaemon *daemon = NULL;
@@ -1068,6 +1085,9 @@ handle_delete (UDisksPartition       *partition,
   g_clear_object (&object);
 
   return TRUE; /* returning TRUE means that we handled the method invocation */
+#else
+  return FALSE;
+#endif
 }
 
 /* ---------------------------------------------------------------------------------------------------- */

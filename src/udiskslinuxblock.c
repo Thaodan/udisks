@@ -39,7 +39,9 @@
 
 #include <libmount/libmount.h>
 
+#ifdef HAVE_BLOCKDEV_PART
 #include <blockdev/part.h>
+#endif
 #include <blockdev/fs.h>
 #include <blockdev/crypto.h>
 
@@ -61,13 +63,16 @@
 #include "udisksbasejob.h"
 #include "udiskssimplejob.h"
 #include "udiskslinuxdriveata.h"
-#include "udiskslinuxmdraidobject.h"
 #include "udiskslinuxdevice.h"
 #include "udiskslinuxpartition.h"
 #include "udiskslinuxencrypted.h"
 #include "udiskslinuxencryptedhelpers.h"
 #include "udiskslinuxpartitiontable.h"
 #include "udiskslinuxfilesystemhelpers.h"
+
+#ifdef HAVE_BLOCKDEV_MDRAID
+#include "udiskslinuxmdraidobject.h"
+#endif
 
 #ifdef HAVE_LIBMOUNT_UTAB
 #include "udisksutabmonitor.h"
@@ -280,6 +285,8 @@ find_drive (GDBusObjectManagerServer  *object_manager,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
+#ifdef HAVE_BLOCKDEV_MDRAID
+
 static UDisksLinuxMDRaidObject *
 find_mdraid (GDBusObjectManagerServer  *object_manager,
              const gchar               *md_uuid)
@@ -351,6 +358,8 @@ update_mdraid (UDisksLinuxBlock         *block,
   udisks_block_set_mdraid (iface, objpath_mdraid);
   udisks_block_set_mdraid_member (iface, objpath_mdraid_member);
 }
+
+#endif
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -1244,7 +1253,9 @@ udisks_linux_block_update (UDisksLinuxBlock       *block,
 #ifdef HAVE_LIBMOUNT_UTAB
   update_userspace_mount_options (block, daemon);
 #endif
+#ifdef HAVE_BLOCKDEV_MDRAID
   update_mdraid (block, device, drive, object_manager);
+#endif
 
  out:
   g_dbus_interface_skeleton_flush (G_DBUS_INTERFACE_SKELETON (block));
@@ -2966,7 +2977,9 @@ udisks_linux_block_handle_format (UDisksBlock             *block,
   GVariant *config_items = NULL;
   gboolean teardown_flag = FALSE;
   gboolean no_discard_flag = FALSE;
+#ifdef HAVE_BLOCKDEV_PART
   BDPartTableType part_table_type = BD_PART_TABLE_UNDEF;
+#endif
   UDisksObject *filesystem_object;
 
   error = NULL;
@@ -3357,12 +3370,14 @@ udisks_linux_block_handle_format (UDisksBlock             *block,
         }
     }
 
+#ifdef HAVE_BLOCKDEV_PART
   if (g_strcmp0 (type, "dos") == 0)
     part_table_type = BD_PART_TABLE_MSDOS;
   else if (g_strcmp0 (type, "gpt") == 0)
     part_table_type = BD_PART_TABLE_GPT;
 
   if (part_table_type == BD_PART_TABLE_UNDEF)
+#endif
     {
       /* Build and run mkfs shell command */
       const gchar *device = udisks_block_get_device (block_to_mkfs);
@@ -3391,6 +3406,7 @@ udisks_linux_block_handle_format (UDisksBlock             *block,
         }
       g_free (error_message);
     }
+#ifdef HAVE_BLOCKDEV_PART
   else
     {
       /* Create the partition table. */
@@ -3418,6 +3434,7 @@ udisks_linux_block_handle_format (UDisksBlock             *block,
             }
         }
     }
+#endif
 
   /* The mkfs program may not generate all the uevents we need - so explicitly
    * trigger an event here

@@ -573,23 +573,31 @@ AM_CONDITIONAL(HAVE_VDO, [test "x$have_vdo" = "xyes"])
 
 if test "x$enable_daemon" = "xyes"; then
   # libblockdev part
-  SAVE_CFLAGS=$CFLAGS
-  SAVE_LDFLAGS=$LDFLAGS
+  AC_ARG_ENABLE(blockdev-part, [AS_HELP_STRING([--enable-blockdev-part],
+                             [enable libblockdev-part support [default=yes]])],
+              enable_blockdev_part=yes,)
+  if test ! "x$enable_blockdev_part" = "xno"; then
+     SAVE_CFLAGS=$CFLAGS
+     SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
-  LDFLAGS="$GLIB_LIBS"
-  AC_MSG_CHECKING([libblockdev-part presence])
-  AC_TRY_COMPILE([#include <blockdev/part.h>], [],
-                 [AC_MSG_RESULT([yes])
-                 have_part=yes],
-                 [AC_MSG_RESULT([no])
-                 have_part=no])
+     CFLAGS="$GLIB_CFLAGS"
+     LDFLAGS="$GLIB_LIBS"
+     AC_MSG_CHECKING([libblockdev-part presence])
+     AC_TRY_COMPILE([#include <blockdev/part.h>], [],
+                    [AC_MSG_RESULT([yes])
+                     AC_DEFINE([HAVE_BLOCKDEV_PART], 1, [Define, if libblockdev-part is available])
+                     have_blockdev_part=yes],
+                    [AC_MSG_RESULT([no])
+                     have_blockdev_part=no])
 
-  CFLAGS=$SAVE_CFLAGS
-  LDFLAGS=$SAVE_LDFLAGS
+     CFLAGS=$SAVE_CFLAGS
+     LDFLAGS=$SAVE_LDFLAGS
 
-  if test "x$have_part" = "xno"; then
-    AC_MSG_ERROR([BlockDev part support requested but header or library not found])
+     if test "x$have_blockdev_part" = "xno" ; then
+        if test "x$enable_blockdev_part" = "xyes"; then
+           AC_MSG_ERROR([BlockDev part support requested but header or library not found])
+        fi
+     fi
   fi
 
   # libblockdev loop
@@ -633,23 +641,31 @@ if test "x$enable_daemon" = "xyes"; then
   fi
 
   # libblockdev mdraid
-  SAVE_CFLAGS=$CFLAGS
-  SAVE_LDFLAGS=$LDFLAGS
+  AC_ARG_ENABLE(blockdev-mraid, [AS_HELP_STRING([--enable-blockdev-mdraid],
+                             [enable libblockdev-part support [default=yes]])],
+                             enable_blockdev_mdraid=yes,)
+  if test ! "x$enable_blockdev_mdraid" = "xno"; then
+     SAVE_CFLAGS=$CFLAGS
+     SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
-  LDFLAGS="$GLIB_LIBS"
-  AC_MSG_CHECKING([libblockdev-mdraid presence])
-  AC_TRY_COMPILE([#include <blockdev/mdraid.h>], [],
-                 [AC_MSG_RESULT([yes])
-                 have_mdraid=yes],
-                 [AC_MSG_RESULT([no])
-                 have_mdraid=no])
+     CFLAGS="$GLIB_CFLAGS"
+     LDFLAGS="$GLIB_LIBS"
+     AC_MSG_CHECKING([libblockdev-mdraid presence])
+     AC_TRY_COMPILE([#include <blockdev/mdraid.h>], [],
+                    [AC_MSG_RESULT([yes])
+                     AC_DEFINE([HAVE_BLOCKDEV_MDRAID], 1, [Define, if libblockdev-mdraid is available])
+                     have_blockdev_mdraid=yes],
+                    [AC_MSG_RESULT([no])
+                     have_blockdev_mdraid=no])
 
-  CFLAGS=$SAVE_CFLAGS
-  LDFLAGS=$SAVE_LDFLAGS
+     CFLAGS=$SAVE_CFLAGS
+     LDFLAGS=$SAVE_LDFLAGS
 
-  if test "x$have_mdraid" = "xno"; then
-    AC_MSG_ERROR([BLOCKDEV MDRAID support requested but header or library not found])
+     if test "x$have_blockdev_mdraid" = "xno"; then
+        if test "x$enable_blockdev_mdraid" = "xyes"; then
+           AC_MSG_ERROR([BLOCKDEV MDRAID support requested but header or library not found])
+        fi
+     fi
   fi
 
   # libblockdev fs
@@ -692,6 +708,7 @@ if test "x$enable_daemon" = "xyes"; then
     AC_MSG_ERROR([BLOCKDEV CRYPTO support requested but header or library not found])
   fi
 fi
+AM_CONDITIONAL(HAVE_BLOCKDEV_MDRAID, test "x$have_blockdev_mdraid" = "xyes")
 
 
 # Internationalization
@@ -846,4 +863,6 @@ echo "
         LibStorageMgmt module:      ${have_lsm}
         Bcache module:              ${have_bcache}
         VDO module (deprecated):    ${have_vdo}
+        LibBlockDev-part:           ${have_blockdev_part:-no}
+        LibBlockDev-mdraid:         ${have_blockdev_mdraid:-no}
 "

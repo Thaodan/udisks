@@ -328,18 +328,33 @@ udisks_daemon_constructed (GObject *object)
   uuid_t uuid;
 
   /* NULL means no specific so_name (implementation) */
+#ifdef HAVE_BLOCKDEV_PART
   BDPluginSpec part_plugin = {BD_PLUGIN_PART, NULL};
+#endif
   BDPluginSpec swap_plugin = {BD_PLUGIN_SWAP, NULL};
   BDPluginSpec loop_plugin = {BD_PLUGIN_LOOP, NULL};
+#ifdef HAVE_BLOCKDEV_MDRAID
   BDPluginSpec mdraid_plugin = {BD_PLUGIN_MDRAID, NULL};
+#endif
   BDPluginSpec fs_plugin = {BD_PLUGIN_FS, NULL};
   BDPluginSpec crypto_plugin = {BD_PLUGIN_CRYPTO, NULL};
 
   /* The core daemon needs the part, swap, loop, mdraid, fs and crypto plugins.
      Additional plugins are required by various modules, but they make sure
      plugins are loaded themselves. */
+#if defined(HAVE_BLOCKDEV_PART) && defined(HAVE_BLOCKDEV_MDRAID)
   BDPluginSpec *plugins[] = {&part_plugin, &swap_plugin, &loop_plugin, &mdraid_plugin,
                              &fs_plugin, &crypto_plugin, NULL};
+#elif defined(HAVE_BLOCKDEV_PART)
+  BDPluginSpec *plugins[] = {&part_plugin, &swap_plugin, &loop_plugin,
+                             &fs_plugin, &crypto_plugin, NULL};
+#elif defined(HAVE_BLOCKDEV_MDRAID)
+  BDPluginSpec *plugins[] = {&swap_plugin, &loop_plugin, &mdraid_plugin,
+                             &fs_plugin, &crypto_plugin, NULL};
+#else
+  BDPluginSpec *plugins[] = {&swap_plugin, &loop_plugin, &fs_plugin, &crypto_plugin, NULL};
+#endif
+
   BDPluginSpec **plugin_p = NULL;
   error = NULL;
 

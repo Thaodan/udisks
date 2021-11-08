@@ -31,7 +31,9 @@
 
 #include <glib/gstdio.h>
 
+#ifdef HAVE_BLOCKDEV_PART
 #include <blockdev/part.h>
+#endif
 #include <blockdev/fs.h>
 
 #include "udiskslogging.h"
@@ -256,6 +258,7 @@ udisks_linux_partition_table_handle_create_partition (UDisksPartitionTable   *ta
                                                       const gchar            *name,
                                                       GVariant               *options)
 {
+#ifdef HAVE_BLOCKDEV_PART
   const gchar *action_id = NULL;
   const gchar *message = NULL;
   UDisksBlock *block = NULL;
@@ -562,6 +565,9 @@ udisks_linux_partition_table_handle_create_partition (UDisksPartitionTable   *ta
   if (overlapping_part)
     bd_part_spec_free (overlapping_part);
   return partition_object;
+#else
+  return NULL;
+#endif
 }
 
 static int
